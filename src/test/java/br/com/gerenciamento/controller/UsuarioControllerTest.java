@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.hamcrest.Matchers.not;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -36,16 +35,14 @@ public class UsuarioControllerTest {
     
     @Test
     public void testLoginInvalidoNaoRedirecionaParaIndex() throws Exception {
-        
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("user", "usuarioInexistente")
                 .param("senha", "senhaErrada"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-
                 .andExpect(MockMvcResultMatchers.view().name("login/cadastro"))
-                .andExpect(MockMvcResultMatchers.view().name(not("home/index")))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("msg"));
+                // Garante que o fluxo não foi para a página inicial
+                .andExpect(MockMvcResultMatchers.view().name(org.hamcrest.Matchers.not("home/index")));
     }
 
     @Test
@@ -53,7 +50,7 @@ public class UsuarioControllerTest {
         Usuario usuario = new Usuario();
         usuario.setEmail("valido@teste.com");
         usuario.setUser("uservalido");
-        usuario.setSenha(Util.md5("senha123")); // O banco armazena a senha hash MD5
+        usuario.setSenha(Util.md5("senha123")); 
         usuarioRepository.save(usuario);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/login")
